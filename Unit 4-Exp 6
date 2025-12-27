@@ -1,0 +1,44 @@
+import random
+
+# start, goal, obstacles
+start = (0, 0)
+goal = (10, 10)
+obstacles = [(4,5), (6,6), (7,4)]
+radius = 1
+
+# distance (no math lib)
+def dist(a, b):
+    return ((a[0]-b[0])**2 + (a[1]-b[1])**2)
+
+# cost function
+def cost(path):
+    c = 0
+    for i in range(len(path)-1):
+        c += dist(path[i], path[i+1])
+        for o in obstacles:
+            if dist(path[i], o) < radius*radius:
+                c += 50
+    return c
+
+# initial straight path
+N = 10
+path = [(start[0]+i, start[1]+i) for i in range(N)]
+path.append(goal)
+
+# optimize using random gradient-style updates
+lr = 0.1
+for _ in range(200):
+    new = [path[0]]
+    for i in range(1, len(path)-1):
+        x = path[i][0] + random.uniform(-lr, lr)
+        y = path[i][1] + random.uniform(-lr, lr)
+        new.append((x,y))
+    new.append(path[-1])
+
+    if cost(new) < cost(path):
+        path = new
+
+# output trajectory
+print("Optimized Robot Path:")
+for p in path:
+    print(p)
